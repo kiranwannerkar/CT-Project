@@ -3,6 +3,7 @@ package com.cpt.payments.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -10,10 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cpt.payments.pojo.AddRequest;
 import com.cpt.payments.pojo.AddResponse;
+import com.cpt.payments.service.TestService;
 
 @RestController
 @RequestMapping("/controller")
-public class PaymentController {
+public class TestController {
 
 	@GetMapping("/hello")
 	public String getMsg() {
@@ -40,8 +42,8 @@ public class PaymentController {
 
 	}
 
-	@PostMapping("/processJson")  
-	@ResponseBody //response we can convert into json back
+	@PostMapping("/processJson")
+	@ResponseBody // response we can convert into json back
 	public AddResponse processJson(@RequestBody AddRequest request) {
 		System.out.println("Calling processJSON::request:" + request);
 		int res = request.getNum1() + request.getNum2();
@@ -54,9 +56,25 @@ public class PaymentController {
 
 	}
 
+	@PostMapping("/validateAndProcess")
+	@ResponseBody // response we can convert into json back
+	public AddResponse validateAndProcess(@RequestHeader("signature") String signature,
+			@RequestBody AddRequest request) {
+		System.out.println("Calling validateAndProcess::request:" + request + "|signature :" + signature);
+
+		TestService service = new TestService();
+		int res = service.validateAndProcess(request,signature);
+
+		AddResponse response = new AddResponse();
+		response.setResValue(res);
+
+		System.out.println("Add res:" + response);
+		return response;
+
+	}
+
 	public String initPayment(String paymentMethod, int amount, String curr) { // this method we have to give ecomerce
 																				// guy
-
 		return "Payment Processed Successfully";
 
 	}
